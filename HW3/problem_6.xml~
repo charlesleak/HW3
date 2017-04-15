@@ -1,0 +1,109 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+
+<simulation name="problem 6" type="fixed source">
+  <histories start="1" end="10000000" />
+</simulation>
+
+<distributions>
+  <uniformXCylinder name="pos dist" datatype="point" x = "-5.0" y = "0.0" z = "0.0" R = "2.0" dx = "0.0" />
+  <delta            name="dir dist" datatype="point" x = "1.0" y = "0.0" z = "0.0"  />
+  <uniform          name="isotropic scatter" datatype="double" a="-1.0" b="1.0" />
+  <linear           name="anisotropic scatter" datatype="double" a="-1.0" b="1.0" fa="0.5" fb="1.5" />
+  
+</distributions>
+
+<nuclides>
+  <nuclide name="nuc1" atomicMass="2"> 
+    <capture xs="1.0"/>
+    <scatter xs="2.4" distribution="anisotropic scatter"/>
+  </nuclide>
+  <nuclide name="nucdet" atomicMass="1">
+    <scatter xs="2.0" distribution="isotropic scatter"/>
+  </nuclide>
+</nuclides>
+
+<materials>
+  <material name="mat1" density="0.1">
+    <nuclide name="nuc1" frac="1.0"/>
+  </material>
+  <material name="matdet" density="0.1">
+    <nuclide name="nucdet" frac="1.0"/>
+  </material>
+</materials>
+
+<surfaces>
+  <sphere name="ballSurface" x0="0.0" y0="0.0" z0="0.0" rad="5.0"/>
+  <conex name="boreHole" slope="0.2" />
+  <plane name="boreEnd" a="1.0" b="0.0" c="0.0" d="-1.0"/>
+  <cylinderx name="detectorsSurface" y0="0.0" z0="-10.0" rad="0.5"/>
+  <plane name="LdetectorL" a="1.0" b="0.0" c="0.0" d="-25.0"/>
+  <plane name="LdetectorR" a="1.0" b="0.0" c="0.0" d="-20.0"/>
+  <plane name="RdetectorL" a="1.0" b="0.0" c="0.0" d="20.0"/>
+  <plane name="RdetectorR" a="1.0" b="0.0" c="0.0" d="25.0"/>
+  <sphere name="everything" x0="0.0" y0="0.0" z0="0.0" rad="40.0"/>
+</surfaces>
+
+<cells>
+  <cell name="ball" material="mat1">
+    <surface name="ballSurface" sense="-1"/>
+    <surface name="boreHole" sense="+1"/>
+  </cell>
+  <cell name="moreBall">
+    <surface name="ballSurface" sense="-1"/>
+    <surface name="boreHole" sense="-1"/>
+    <surface name="boreEnd" sense="+1"/>
+  </cell>
+  <cell name="bore">
+    <surface name="ballSurface" sense="-1"/>
+    <surface name="boreHole" sense="-1"/>
+    <surface name="boreEnd" sense="-1"/>
+  </cell>
+  <cell name="detectorL" material="matdet">
+    <surface name="detectorsSurface" sense="-1"/>
+    <surface name="LdetectorL" sense="+1"/>
+    <surface name="LdetectorR" sense="-1"/>
+  </cell>
+  <cell name="detectorR" material="matdet">
+    <surface name="detectorsSurface" sense="-1"/>
+    <surface name="RdetectorL" sense="+1"/>
+    <surface name="RdetectorR" sense="-1"/>
+  </cell>
+  <cell name="air1">
+    <surface name="ballSurface" sense="+1"/>
+    <surface name="detectorsSurface" sense="+1"/>
+    <surface name="everything" sense="-1"/>
+  </cell>
+  <cell name="air2">
+    <surface name="detectorsSurface" sense="-1"/>
+    <surface name="RdetectorL" sense="-1"/>
+    <surface name="LdetectorR" sense="+1"/>
+    <surface name="everything" sense="-1"/>
+  </cell>
+  <cell name="air3">
+    <surface name="detectorsSurface" sense="-1"/>
+    <surface name="RdetectorR" sense="+1"/>
+    <surface name="everything" sense="-1"/>
+  </cell>
+  <cell name="air4">
+    <surface name="detectorsSurface" sense="-1"/>
+    <surface name="LdetectorL" sense="-1"/>
+    <surface name="everything" sense="-1"/>
+  </cell>
+  <cell name="outside" importance="0.0">
+    <surface name="everything" sense="+1"/>
+  </cell>
+</cells>
+
+<estimators>
+  <trackLengthTimed name="track length vs time L">
+    <cell name="detectorL"/>
+  </trackLengthTimed>
+  <trackLengthTimed name="track length vs time R">
+    <cell name="detectorR"/>
+  </trackLengthTimed>
+</estimators>
+
+<source>
+  <position  distribution="pos dist"/>
+  <direction distribution="dir dist"/>
+</source>
